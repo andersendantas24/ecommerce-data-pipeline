@@ -185,8 +185,36 @@ def silver_ingestion(spark):
 
 
 
-def create():
-    
+from pathlib import Path
+from pyspark.sql.functions import sum, max, collect_set, concat_ws
+
+
+def create_payments_summary(spark):
+    BASE_DIR = Path(__file__).resolve().parents[2]
+    SILVER_PATH = BASE_DIR / "delta" / "silver"
+
+    payments_df = spark.read.format("delta").load(
+        str(SILVER_PATH / "olist_order_payments_dataset")
+    )
+
+    payments_summary = (
+        payments_df
+        .groupBy("order_id")
+        .agg(
+            sum("payment_value").alias("total_pago"),
+            max("payment_installments").alias("quantidade_parcelas"),
+            concat_ws(", ", collect_set("payment_type")).alias("formas_pagamento")
+        )
+    )
+
+    payments_summary.write \
+        .format("delta") \
+        .mode("overwrite") \
+        .save(str(SILVER_PATH / "payments_summary"))
+
+    print("Tabela payments_summary criada com sucesso.")
+
+
 
 
 def validate_silver_tables(spark):
