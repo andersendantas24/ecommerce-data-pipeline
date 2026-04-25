@@ -13,6 +13,11 @@ def get_spark(app_name: str = "ecommerce"):
     builder = (
         SparkSession.builder
         .appName('ecommerce')
+        .master("local[*]")
+        .config("spark.driver.memory", "2g")
+        .config("spark.sql.shuffle.partitions", "4")
+        .config("spark.default.parallelism", "4")
+        .config("spark.sql.adaptive.enabled", "true")
         .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
         .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
         # .config("spark.hadoop.io.nativeio", "false")

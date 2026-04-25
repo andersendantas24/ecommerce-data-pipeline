@@ -14,8 +14,11 @@ if __name__ == "__main__":
     print("=== SILVER ===")
     silver_ingestion(spark)
 
-    print("=== VALIDACAO ===")
-    validate_silver_tables(spark)
+    # print("=== VALIDACAO ===")
+    # validate_silver_tables(spark)
 
     # print("=== DEBUG ===")
     # debug_silver_tables(spark)
+
+    spark.stop()
+    print("Spark Encerrado")

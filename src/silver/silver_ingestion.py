@@ -31,15 +31,15 @@ def remove_null(df, required_columns):
         print("Nenhuma coluna válida para remoção de nulos.")
         return df
 
-    before = df.count()
+    # before = df.count()
 
     df = df.dropna(subset=colunas_existentes)
 
-    after = df.count()
+    # after = df.count()
 
     print(f"Colunas usadas para remoção: {colunas_existentes}")
-    print(f"Registros removidos: {before - after}")
-    print(f"Total restante: {after}")
+    # print(f"Registros removidos: {before - after}")
+    # print(f"Total restante: {after}")
 
     return df
 
@@ -56,17 +56,38 @@ def remove_duplicates(df, subset_columns):
         print("Nenhuma coluna válida para deduplicação.")
         return df
 
-    before = df.count()
+    # before = df.count()
 
     df = df.dropDuplicates(colunas_existentes)
 
-    after = df.count()
+    # after = df.count()
 
     print(f"Colunas usadas para deduplicação: {colunas_existentes}")
-    print(f"Duplicados removidos: {before - after}")
-    print(f"Total restante: {after}")
+    # print(f"Duplicados removidos: {before - after}")
+    # print(f"Total restante: {after}")
 
     return df
+
+
+
+def filter_valid_orders(df):
+    """
+    Mantém apenas pedidos com status 'delivered' ou 'shipped'.
+    
+    Parâmetros:
+        df (DataFrame): DataFrame de pedidos
+    
+    Retorna:
+        DataFrame filtrado
+    """
+
+    valid_status = ["delivered", "shipped"]
+
+    df_filtered = df.filter(col("order_status").isin(valid_status))
+
+    print(f"Filtrando pedidos válidos: {valid_status}")
+
+    return df_filtered
 
 
 
@@ -84,8 +105,11 @@ def process_table(spark, bronze_path, silver_path):
     # remove registros com chaves nulas, quando existirem na tabela
     df = remove_null(df, ["order_id", "customer_id"])
 
-    # 🔥 remover duplicados
+    # remover duplicados
     df = remove_duplicates(df, ["order_id"])
+
+    # filtrar pedidos
+    df = filter_valid_orders(df)
 
     # salva na Silver
     df.write \
