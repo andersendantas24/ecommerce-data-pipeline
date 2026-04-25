@@ -79,14 +79,55 @@ def create_gold_product_summary(spark):
 
 
 
+def create_seller_summary(spark):
+    
+    BASE_DIR = Path(__file__).resolve().parents[2]
+
+    SILVER_PATH = BASE_DIR / "delta" / "silver"
+    GOLD_PATH = BASE_DIR / "delta" / "gold"
+
+    # leitura das tabelas
+    orders_df = spark.read.format("delta").load(str(SILVER_PATH / "orders_consolidated"))
+    reviews_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_order_reviews_dataset"))
+
+    # join com reviews
+    df = (
+        orders_df
+        .join(reviews_df, "order_id", "left")
+    )
+
+    # agregação
+    seller_summary = (
+        df.groupBy(
+            "seller_id",
+            "seller_city",
+            "seller_state"
+        )
+        .agg(
+            countDistinct("order_id").alias("total_orders"),
+            spark_sum(col("price") + col("freight_value")).alias("total_revenue"),
+            avg("review_score").alias("avg_review_score")
+        )
+    )
+
+    # salvar
+    seller_summary.write \
+        .format("delta") \
+        .mode("overwrite") \
+        .save(str(GOLD_PATH / "seller_summary"))
+
+    print("Tabela gold_seller_summary criada com sucesso!")
+
+
+
 def gold_ingestion(spark):
     BASE_DIR = Path(__file__).resolve().parents[2]
     GOLD_PATH = BASE_DIR / "delta" / "gold"
     
     steps = [
         ("customer_summary", create_gold_customer_summary),
-        ("product_summary", create_gold_product_summary)
-        # ("seller_summary", create_seller_summary),
+        ("product_summary", create_gold_product_summary),
+        ("seller_summary", create_seller_summary)
     ]
 
     for name, func in steps:
