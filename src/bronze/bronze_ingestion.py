@@ -13,7 +13,7 @@ def get_spark(app_name: str = "ecommerce"):
     builder = (
         SparkSession.builder
         .appName('ecommerce')
-        .master("local[*]")
+        .master("local[2]")
         .config("spark.driver.memory", "2g")
         .config("spark.sql.shuffle.partitions", "4")
         .config("spark.default.parallelism", "4")

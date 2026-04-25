@@ -71,23 +71,67 @@ def remove_duplicates(df, subset_columns):
 
 
 def filter_valid_orders(df):
-    """
-    Mantém apenas pedidos com status 'delivered' ou 'shipped'.
-    
-    Parâmetros:
-        df (DataFrame): DataFrame de pedidos
-    
-    Retorna:
-        DataFrame filtrado
-    """
-
     valid_status = ["delivered", "shipped"]
 
-    df_filtered = df.filter(col("order_status").isin(valid_status))
+    if "order_status" in df.columns:
+        print("Aplicando filtro de pedidos validos")
 
-    print(f"Filtrando pedidos válidos: {valid_status}")
+        return df.filter(col("order_status").isin(valid_status))
+    
+    else:
+        print("Coluna 'order_status' não encontrada - ignorando filtro")
 
-    return df_filtered
+    return df
+
+
+
+def join_ecommerce_tables_clean(
+    orders_df,
+    order_items_df,
+    customers_df,
+    products_df,
+    sellers_df
+):
+
+    df = (
+        orders_df
+        .join(customers_df, "customer_id", "left")
+        .join(order_items_df, "order_id", "left")
+        .join(products_df, "product_id", "left")
+        .join(sellers_df, "seller_id", "left")
+    )
+
+    return df
+
+
+
+def create_orders_consolidated(spark):
+    BASE_DIR = Path(__file__).resolve().parents[2]
+    SILVER_PATH = BASE_DIR / "delta" / "silver"
+
+    orders_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_orders_dataset"))
+    order_items_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_order_items_dataset"))
+    customers_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_customers_dataset"))
+    products_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_products_dataset"))
+    sellers_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_sellers_dataset"))
+
+    df = join_ecommerce_tables_clean(
+        orders_df,
+        order_items_df,
+        customers_df,
+        products_df,
+        sellers_df
+    )
+
+    output_path = SILVER_PATH / "orders_consolidated"
+
+    df.write \
+        .format("delta") \
+        .mode("overwrite") \
+        .option("overwriteSchema", "true") \
+        .save(str(output_path))
+
+    print(f"Tabela salva em: {output_path}")
 
 
 
@@ -110,6 +154,9 @@ def process_table(spark, bronze_path, silver_path):
 
     # filtrar pedidos
     df = filter_valid_orders(df)
+
+    df = create_orders_consolidated(spark)
+
 
     # salva na Silver
     df.write \

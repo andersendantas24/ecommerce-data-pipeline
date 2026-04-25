@@ -8,8 +8,8 @@ from src.silver.silver_ingestion import silver_ingestion, validate_silver_tables
 if __name__ == "__main__":
     spark = get_spark()
 
-    print("=== BRONZE ===")
-    ingest_raw_to_bronze()
+    # print("=== BRONZE ===")
+    # ingest_raw_to_bronze()
 
     print("=== SILVER ===")
     silver_ingestion(spark)
