@@ -115,6 +115,11 @@ def create_orders_consolidated(spark):
     products_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_products_dataset")).drop("ingestion_timestamp")
     sellers_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_sellers_dataset")).drop("ingestion_timestamp")
 
+    
+
+    order_items_df = order_items_df.withColumn("price", col("price").cast("double"))
+    order_items_df = order_items_df.withColumn("freight_value", col("freight_value").cast("double"))
+
     df = join_ecommerce_tables_clean(
         orders_df,
         order_items_df,
