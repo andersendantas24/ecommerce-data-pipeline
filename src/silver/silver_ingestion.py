@@ -36,6 +36,7 @@ def process_table(spark, bronze_path, silver_path):
     df.write \
         .format("delta") \
         .mode("overwrite") \
+        .option("overwriteSchema", "true") \
         .save(silver_path)
     
 
