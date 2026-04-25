@@ -25,10 +25,21 @@ def get_spark(app_name: str = "ecommerce"):
 def read_csv(file_path: Path):
     spark = get_spark()
 
-    return(
+    # return(
+    #     spark.read
+    #     .option("header", True)
+    #     .option("inferSchema", True)
+    #     .csv(str(file_path))
+    # )
+
+    return (
         spark.read
         .option("header", True)
-        .option("inferSchema", True)
+        .option("inferSchema", False)
+        .option("multiLine", True)
+        .option("quote", '"')
+        .option("escape", '"')
+        .option("encoding", "UTF-8")
         .csv(str(file_path))
     )
 
