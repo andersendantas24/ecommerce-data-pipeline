@@ -110,10 +110,10 @@ def create_orders_consolidated(spark):
     SILVER_PATH = BASE_DIR / "delta" / "silver"
 
     orders_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_orders_dataset"))
-    order_items_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_order_items_dataset"))
-    customers_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_customers_dataset"))
-    products_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_products_dataset"))
-    sellers_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_sellers_dataset"))
+    order_items_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_order_items_dataset")).drop("ingestion_timestamp")
+    customers_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_customers_dataset")).drop("ingestion_timestamp")
+    products_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_products_dataset")).drop("ingestion_timestamp")
+    sellers_df = spark.read.format("delta").load(str(SILVER_PATH / "olist_sellers_dataset")).drop("ingestion_timestamp")
 
     df = join_ecommerce_tables_clean(
         orders_df,
@@ -155,9 +155,6 @@ def process_table(spark, bronze_path, silver_path):
     # filtrar pedidos
     df = filter_valid_orders(df)
 
-    df = create_orders_consolidated(spark)
-
-
     # salva na Silver
     df.write \
         .format("delta") \
@@ -184,6 +181,12 @@ def silver_ingestion(spark):
 
             process_table(spark, bronze_table, silver_table)
 
+    create_orders_consolidated(spark)
+
+
+
+def create():
+    
 
 
 def validate_silver_tables(spark):
