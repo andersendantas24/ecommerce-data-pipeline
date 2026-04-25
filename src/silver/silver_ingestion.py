@@ -27,10 +27,9 @@ def remove_null(df, required_columns):
         if c in df.columns
     ]
 
-    if colunas_existentes:
-        df = df.dropna(subset=colunas_existentes)
-        print('Colunas null excluidas com sucesso.')
-
+    if not colunas_existentes:
+        print("Nenhuma coluna válida para remoção de nulos.")
+        return df
 
     before = df.count()
 
@@ -40,6 +39,31 @@ def remove_null(df, required_columns):
 
     print(f"Colunas usadas para remoção: {colunas_existentes}")
     print(f"Registros removidos: {before - after}")
+    print(f"Total restante: {after}")
+
+    return df
+
+
+
+def remove_duplicates(df, subset_columns):
+    
+    colunas_existentes = [
+        c for c in subset_columns
+        if c in df.columns
+    ]
+
+    if not colunas_existentes:
+        print("Nenhuma coluna válida para deduplicação.")
+        return df
+
+    before = df.count()
+
+    df = df.dropDuplicates(colunas_existentes)
+
+    after = df.count()
+
+    print(f"Colunas usadas para deduplicação: {colunas_existentes}")
+    print(f"Duplicados removidos: {before - after}")
     print(f"Total restante: {after}")
 
     return df
@@ -59,6 +83,9 @@ def process_table(spark, bronze_path, silver_path):
 
     # remove registros com chaves nulas, quando existirem na tabela
     df = remove_null(df, ["order_id", "customer_id"])
+
+    # 🔥 remover duplicados
+    df = remove_duplicates(df, ["order_id"])
 
     # salva na Silver
     df.write \
