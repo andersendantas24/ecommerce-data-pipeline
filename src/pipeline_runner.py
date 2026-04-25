@@ -12,9 +12,9 @@ if __name__ == "__main__":
     # print("=== BRONZE ===")
     # ingest_raw_to_bronze()
 
-    print("=== SILVER ===")
-    silver_ingestion(spark)
-    print("=== FIM SILVER ===")
+    # print("=== SILVER ===")
+    # silver_ingestion(spark)
+    # print("=== FIM SILVER ===")
 
     # print("=== PAYMENTS ===")
     # create_payments_summary(spark)
