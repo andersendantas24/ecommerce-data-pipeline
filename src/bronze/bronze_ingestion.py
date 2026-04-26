@@ -20,7 +20,7 @@ def get_spark(app_name: str = "ecommerce"):
         .config("spark.sql.adaptive.enabled", "true")
         .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
         .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
-        # .config("spark.hadoop.io.nativeio", "false")
+        
     )
 
     return configure_spark_with_delta_pip(builder).getOrCreate()
@@ -29,13 +29,6 @@ def get_spark(app_name: str = "ecommerce"):
 
 def read_csv(spark, file_path):
     spark = get_spark()
-
-    # return(
-    #     spark.read
-    #     .option("header", True)
-    #     .option("inferSchema", True)
-    #     .csv(str(file_path))
-    # )
 
     return (
         spark.read

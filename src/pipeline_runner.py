@@ -47,38 +47,3 @@ def run_pipeline():
 
 if __name__ == "__main__":
     run_pipeline()
-
-
-
-#--------------------------------------------
-
-
-# if __name__ == "__main__":
-#     spark = get_spark()
-
-    # print("=== BRONZE ===")
-    # ingest_raw_to_bronze()
-
-    # print("=== SILVER ===")
-    # silver_ingestion(spark)
-    # print("=== FIM SILVER ===")
-
-    # print("=== PAYMENTS ===")
-    # create_payments_summary(spark)
-
-    # print("=== GOLD ===")
-    # gold_ingestion(spark)
-    # print("=== FIM GOLD ===")
-
-    # print("=== Delta_Sharing ===")
-    # share_simulation(spark)
-    # print("=== FIM Delta_Sharing ===")
-
-    # print("=== VALIDACAO ===")
-    # validate_silver_tables(spark)
-
-    # print("=== DEBUG ===")
-    # debug_silver_tables(spark)
-
-    # spark.stop()
-    # print("Spark Encerrado")

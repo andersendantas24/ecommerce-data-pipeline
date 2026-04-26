@@ -31,16 +31,10 @@ def remove_null(df, required_columns):
         print("Nenhuma coluna válida para remoção de nulos.")
         return df
 
-    # before = df.count()
-
     df = df.dropna(subset=colunas_existentes)
 
-    # after = df.count()
-
     print(f"Colunas usadas para remoção: {colunas_existentes}")
-    # print(f"Registros removidos: {before - after}")
-    # print(f"Total restante: {after}")
-
+    
     return df
 
 
@@ -56,15 +50,10 @@ def remove_duplicates(df, subset_columns):
         print("Nenhuma coluna válida para deduplicação.")
         return df
 
-    # before = df.count()
-
     df = df.dropDuplicates(colunas_existentes)
 
-    # after = df.count()
-
     print(f"Colunas usadas para deduplicação: {colunas_existentes}")
-    # print(f"Duplicados removidos: {before - after}")
-    # print(f"Total restante: {after}")
+    
 
     return df
 
