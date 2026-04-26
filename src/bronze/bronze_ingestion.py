@@ -27,7 +27,7 @@ def get_spark(app_name: str = "ecommerce"):
 
 
 
-def read_csv(file_path: Path):
+def read_csv(spark, file_path):
     spark = get_spark()
 
     # return(
@@ -52,14 +52,14 @@ def add_ingestion_timestamp(df):
     return df.withColumn("ingestion_timestamp", current_timestamp())
 
 
-def ingest_raw_to_bronze():
+def ingest_raw_to_bronze(spark):
 
     BASE_DIR = Path(__file__).resolve().parents[2]
     RAW_PATH = BASE_DIR /"data" / "raw"
     BRONZE_PATH = BASE_DIR /"delta" / "bronze"
 
     for file in RAW_PATH.glob("*.csv"):
-        df = read_csv(file)
+        df = read_csv(spark, file)
 
         df = add_ingestion_timestamp(df)
 
